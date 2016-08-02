@@ -29,6 +29,8 @@
 
     - name: "reflect .profile"
       shell: source ~/.profile executable=/bin/bash
+      sudo: yes
+      sudo_user: kohei
 
     - name: "libreadline-dev install"
       apt: pkg=libreadline-dev
