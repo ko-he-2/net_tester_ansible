@@ -3,62 +3,14 @@
   vars:
     - proj_dest: /home/kohei
   tasks:
-    - name: "apt-get install for ruby"
-      apt: pkg={{ item }}
-      sudo: yes
-      with_items:
-        - git
-        - build-essential
-        - libssl-dev
-
-    - name: "install rbenv"
-      git: repo=https://github.com/sstephenson/rbenv.git dest=~/.rbenv
-
-    - name: "Install ruby-build"
-      git: repo=https://github.com/sstephenson/ruby-build.git dest=~/.rbenv/plugins/ruby-build
- 
-    - name: Add ~.rbenv/bin to PATH
-      lineinfile: >
-        dest="~/.profile"
-        line="export PATH=$HOME/.rbenv/bin:$PATH"
-
-    - name: Eval rbenv init in ~/.profile
-      lineinfile: >
-        dest="~/.profile"
-        line='eval "$(rbenv init -)"'
-
-    - name: "reflect .profile"
-      shell: source ~/.profile executable=/bin/bash
-      sudo: yes
-      sudo_user: kohei
-
-    - name: "libreadline-dev install"
-      apt: pkg=libreadline-dev
-      sudo: yes
-
-    - name: check ruby
-      shell: /bin/bash -lc "rbenv versions | grep 2.3.1"
-      register: ruby_installed
-      failed_when: ruby_installed.rc not in [0, 1]
-
-    - name: "rbenv install"
-      shell: /bin/sh -lc "rbenv install 2.3.1"
-      when: ruby_installed|failed
-
-    - name: "rbenv global"
-      shell: /bin/sh -lc "rbenv global 2.3.1"
-
-    - name: "Open vSwitch isntall"
-      apt: pkg=openvswitch-switch
-      sudo: yes
-
-    - name: "nettester"
-      git: repo=https://github.com/yasuhito/net_tester.git dest={{proj_dest}}/net_tester version=feature/firewall
-
     - name: "apt-get install"
       apt: pkg={{ item }}
       sudo: yes
       with_items:
+        - git  
+        - ruby2.3
+        - openvswitch-switch
+        - libssl-dev
         - sqlite3
         - libsqlite3-dev
         - libxml2-dev
@@ -70,9 +22,17 @@
         - liblzma-dev
         - libgmp-dev
 
+
+    - name: "nettester"
+      git: repo=https://github.com/yasuhito/net_tester.git dest={{proj_dest}}/net_tester version=feature/firewall
+
     - name: "Install Bundler"
-      gem: name=bundler executable=.rbenv/shims/gem user_install=False
+      sudo: yes
+      gem: name=bundler version=1.11.2 user_install=False
 
     - name: "bundle install"
-      shell: /bin/sh -lc "bundle install" chdir={{proj_dest}}/net_tester
+      sudo: yes
+      shell: /bin/sh -lc "bundle _1.11.2_ install" chdir={{proj_dest}}/net_tester
+
+
 
